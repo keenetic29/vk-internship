@@ -34,7 +34,6 @@ func LoadConfig(filename string) (*Config, error) {
 		LogFile:    getEnv("LOG_FILE", "marketplace.log"),
 	}
 
-	// Валидация обязательных полей
 	if cfg.JWTSecret == "" {
 		return nil, fmt.Errorf("JWT_SECRET is required")
 	}
@@ -42,7 +41,6 @@ func LoadConfig(filename string) (*Config, error) {
 	return cfg, nil
 }
 
-// GetDBConnectionString возвращает строку подключения к PostgreSQL
 func (c *Config) GetDBConnectionString() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		c.DBHost, c.DBPort, c.DBUser, c.DBPassword, c.DBName)

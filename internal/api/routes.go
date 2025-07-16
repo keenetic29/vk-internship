@@ -13,26 +13,21 @@ import (
 func SetupRouter(db *gorm.DB, jwtSecret string) *gin.Engine {
 	router := gin.Default()
 
-	// Репозитории
 	userRepo := repository.NewUserRepository(db)
 	adRepo := repository.NewAdvertisementRepository(db)
 
-	// Сервисы
 	authService := services.NewAuthService(userRepo, jwtSecret)
 	adService := services.NewAdvertisementService(adRepo)
 
-	// Обработчики
 	authHandler := handlers.NewAuthHandler(authService)
 	adHandler := handlers.NewAdvertisementHandler(adService)
 
-	// Группа аутентификации
 	authGroup := router.Group("/auth")
 	{
 		authGroup.POST("/register", authHandler.Register)
 		authGroup.POST("/login", authHandler.Login)
 	}
 
-	// Группа объявлений
 	adGroup := router.Group("/ads")
 	{
 		adGroup.GET("", adHandler.GetAds)
