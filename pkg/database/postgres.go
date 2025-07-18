@@ -10,18 +10,35 @@ import (
 
 
 func InitDB(dsn string) (*gorm.DB, error) {
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
-	}
+    // Сначала подключаемся к БД postgres (которая всегда есть)
+    adminDB, err := gorm.Open(postgres.Open("postgres://postgres:1@localhost:5432/postgres?sslmode=disable"), &gorm.Config{})
+    if err != nil {
+        return nil, fmt.Errorf("failed to connect to admin DB: %w", err)
+    }
 
-	return db, nil
+    // Проверяем существование marketplace
+    var count int64
+    adminDB.Raw("SELECT COUNT(*) FROM pg_database WHERE datname = 'marketplace'").Scan(&count)
+    
+    if count == 0 {
+        // Создаём БД если её нет
+        if err := adminDB.Exec("CREATE DATABASE marketplace").Error; err != nil {
+            return nil, fmt.Errorf("failed to create database: %w", err)
+        }
+    }
+
+    // Теперь подключаемся к нужной БД
+    db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+    if err != nil {
+        return nil, fmt.Errorf("failed to connect to target DB: %w", err)
+    }
+
+    return db, nil
 }
 
 func RunMigrations(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&domain.User{},
 		&domain.Advertisement{},
-		&domain.AuthToken{},
 	)
 }

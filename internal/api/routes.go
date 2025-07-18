@@ -29,8 +29,8 @@ func SetupRouter(db *gorm.DB, jwtSecret string) *gin.Engine {
 	}
 
 	adGroup := router.Group("/ads")
-	{
-		adGroup.GET("", adHandler.GetAds)
+	{	
+		adGroup.GET("", Middleware(jwtSecret), adHandler.GetAds) 
 		adGroup.POST("", JWTMiddleware(jwtSecret), adHandler.CreateAd)
 	}
 
@@ -56,4 +56,25 @@ func JWTMiddleware(jwtSecret string) gin.HandlerFunc {
 		c.Set("userID", userID)
 		c.Next()
 	}
+}
+
+func Middleware(jwtSecret string) gin.HandlerFunc {
+    return func(c *gin.Context) {
+        token := c.GetHeader("Authorization")
+        
+        if token == "" {
+            c.Next()
+            return
+        }
+
+        userID, err := services.NewAuthService(nil, jwtSecret).ValidateToken(token)
+        if err != nil {
+            c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+            c.Abort()
+            return
+        }
+
+        c.Set("userID", userID)
+        c.Next()
+    }
 }

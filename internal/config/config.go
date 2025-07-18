@@ -16,6 +16,7 @@ type Config struct {
 	JWTSecret  string
 	ServerAddr string
 	LogFile    string
+	LogDebug   string
 }
 
 func LoadConfig(filename string) (*Config, error) {
@@ -31,6 +32,7 @@ func LoadConfig(filename string) (*Config, error) {
 		DBName:     getEnv("DB_NAME", "marketplace"),
 		JWTSecret:  getEnv("JWT_SECRET", ""),
 		ServerAddr: getEnv("SERVER_ADDRESS", ":8080"),
+		LogDebug:	getEnv("LOG_DEBUG", "true"),
 		LogFile:    getEnv("LOG_FILE", "marketplace.log"),
 	}
 
@@ -42,8 +44,12 @@ func LoadConfig(filename string) (*Config, error) {
 }
 
 func (c *Config) GetDBConnectionString() string {
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		c.DBHost, c.DBPort, c.DBUser, c.DBPassword, c.DBName)
+    return fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+        c.DBUser,
+        c.DBPassword,
+		c.DBHost,
+		c.DBPort,
+        c.DBName)
 }
 
 func loadEnvFile(filename string) error {

@@ -19,12 +19,6 @@ type Advertisement struct {
 	Price       float64 `gorm:"not null"`
 	UserID      uint    `gorm:"not null"`
 	User        User    `gorm:"foreignKey:UserID"`
-	IsOwner     bool    `gorm:"-" json:"is_owner"`
+	IsOwner     bool    `gorm:"-" json:"is_owner"` 
 	CreatedAt   time.Time
-}
-
-type AuthToken struct {
-	UserID 		uint   	`gorm:"not null"`
-	Token  		string 	`gorm:"primaryKey"`
-	ExpiresAt 	time.Time
 }

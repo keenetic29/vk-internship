@@ -14,7 +14,7 @@ var (
 	mu   sync.Mutex
 )
 
-func Init(debug bool, logDir string) error {
+func Init(debug string, logDir string) error {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -23,14 +23,13 @@ func Init(debug bool, logDir string) error {
 	}
 
 	logPath := filepath.Join(logDir, "marketplace.log")
-	f, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
-	file = f
 
 	level := slog.LevelInfo
-	if debug {
+	if debug == "true" {
 		level = slog.LevelDebug
 	}
 

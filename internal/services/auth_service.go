@@ -45,7 +45,7 @@ func (s *authService) Register(username, password string) (*domain.User, error) 
 
 	user := &domain.User{
 		Username: username,
-		Password: password, // добавить хэш
+		Password: password, // добавить реализацию хэша
 	}
 
 	if err := s.userRepo.Create(user); err != nil {
@@ -65,7 +65,7 @@ func (s *authService) Login(username, password string) (string, error) {
 		return "", errors.New("invalid credentials")
 	}
 
-	token, err := jwt.GenerateToken(user.ID, s.jwtSecret, 24*time.Hour)
+	token, err := jwt.GenerateToken(user.ID, s.jwtSecret, 1*time.Hour)
 	if err != nil {
 		return "", err
 	}

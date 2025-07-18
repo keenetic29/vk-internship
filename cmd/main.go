@@ -5,55 +5,43 @@ import (
 	"VK/internal/config"
 	"VK/pkg/database"
 	"VK/pkg/logger"
-	"os"
+	"log"
 )
 
 func main() {
-	if err := logger.Init(true, "./logs"); err != nil {
-		panic("Failed to initialize logger: " + err.Error())
+	// Загрузка конфигурации
+	cfg, err := config.LoadConfig(".env")
+	if err != nil {
+		log.Fatal("Failed to load config", err)
+	}
+
+	// Инициализация логгера
+	if err := logger.Init(cfg.LogDebug, cfg.LogFile); err != nil {
+		log.Fatal("Failed to initialize logger:", err)
 	}
 	defer logger.Sync()
 
-	logger.Log.Info("Starting marketplace application", 
+	logger.Log.Info("Starting application", 
 		"version", "1.0.0",
-		"environment", "development")
+		"debug", cfg.LogDebug,
+	)
 
-	cfg, err := config.LoadConfig(".")
+	// Инициализация базы данных
+	db, err := database.InitDB(cfg.GetDBConnectionString())
 	if err != nil {
-		logger.Log.Error("Failed to load configuration", "error", err)
-		os.Exit(1)
+		log.Fatal("Failed to connect to database", err)
 	}
-	logger.Log.Debug("Configuration loaded", "db_host", cfg.DBHost, "server_address", cfg.ServerAddr)
 
-	db, err := database.InitDB(cfg.GetDBConnectionString()	)
-	if err != nil {
-		logger.Log.Error("Database connection failed", 
-			"error", err,
-			"host", cfg.DBHost,
-			"port", cfg.DBPort)
-		os.Exit(1)
-	}
-	defer func() {
-		if sqlDB, err := db.DB(); err == nil {
-			sqlDB.Close()
-		}
-	}()
-	logger.Log.Info("Database connection established")
-
+	// Автомиграции
 	if err := database.RunMigrations(db); err != nil {
-		logger.Log.Error("Database migrations failed", "error", err)
-		os.Exit(1)
+		log.Fatal("Failed to run migrations", err)
 	}
-	logger.Log.Info("Database migrations completed")
 
+	// Настройка маршрутов
 	router := api.SetupRouter(db, cfg.JWTSecret)
-	logger.Log.Info("Starting HTTP server", 
-		"address", cfg.ServerAddr,
-		"log_file", "./logs/marketplace.log")
 
+	// Запуск сервера
 	if err := router.Run(cfg.ServerAddr); err != nil {
-		logger.Log.Error("Server failed", "error", err)
-		os.Exit(1)
+		log.Fatal("Failed to start server", err)
 	}
 }
-
