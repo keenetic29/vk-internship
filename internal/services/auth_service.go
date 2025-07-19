@@ -2,6 +2,7 @@ package services
 
 import (
 	"VK/internal/domain"
+	pass "VK/pkg/password"
 	"VK/pkg/jwt"
 	"errors"
 	"time"
@@ -42,9 +43,14 @@ func (s *authService) Register(username, password string) (*domain.User, error) 
 		return nil, errors.New("password must be at least 6 characters")
 	}
 
+	hashedPassword, err := pass.HashPassword(password)
+	if err != nil {
+		return nil, errors.New("failed to hash password")
+	}
+
 	user := &domain.User{
 		Username: username,
-		Password: password, // добавить реализацию хэша
+		Password: hashedPassword, 
 	}
 
 	if err := s.userRepo.Create(user); err != nil {
@@ -60,7 +66,7 @@ func (s *authService) Login(username, password string) (string, error) {
 		return "", errors.New("invalid credentials")
 	}
 
-	if user.Password != password { // сравнить хэши 
+	if err := pass.CheckPassword(password, user.Password); err != nil {
 		return "", errors.New("invalid credentials")
 	}
 
