@@ -2,22 +2,18 @@ package api
 
 import (
 	"VK/internal/api/handlers"
-	"VK/internal/repository"
 	"VK/internal/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-func SetupRouter(db *gorm.DB, jwtSecret string) *gin.Engine {
+func SetupRouter(
+	authService handlers.AuthService,
+	adService handlers.AdvertisementService,
+	jwtSecret string,
+) *gin.Engine {
 	router := gin.Default()
-
-	userRepo := repository.NewUserRepository(db)
-	adRepo := repository.NewAdvertisementRepository(db)
-
-	authService := services.NewAuthService(userRepo, jwtSecret)
-	adService := services.NewAdvertisementService(adRepo)
 
 	authHandler := handlers.NewAuthHandler(authService)
 	adHandler := handlers.NewAdvertisementHandler(adService)
@@ -28,10 +24,10 @@ func SetupRouter(db *gorm.DB, jwtSecret string) *gin.Engine {
 		authGroup.POST("/login", authHandler.Login)
 	}
 
-	adGroup := router.Group("/ads")
-	{	
-		adGroup.GET("", Middleware(jwtSecret), adHandler.GetAds) 
-		adGroup.POST("", JWTMiddleware(jwtSecret), adHandler.CreateAd)
+	apiGroup := router.Group("/ads")
+	{
+		apiGroup.GET("", Middleware(jwtSecret), adHandler.GetAds)
+		apiGroup.POST("", JWTMiddleware(jwtSecret), adHandler.CreateAd)
 	}
 
 	return router

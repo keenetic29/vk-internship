@@ -1,18 +1,24 @@
 package handlers
 
 import (
-	"VK/internal/services"
+	"VK/internal/domain"
 	"VK/pkg/logger"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-type AuthHandler struct {
-	authService services.AuthService
+type AuthService interface {
+    Register(username, password string) (*domain.User, error)
+    Login(username, password string) (string, error)
+    ValidateToken(token string) (uint, error)
 }
 
-func NewAuthHandler(authService services.AuthService) *AuthHandler {
+type AuthHandler struct {
+	authService AuthService
+}
+
+func NewAuthHandler(authService AuthService) *AuthHandler {
 	return &AuthHandler{authService: authService}
 }
 

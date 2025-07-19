@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"VK/internal/services"
+	"VK/internal/domain"
 	"VK/pkg/logger"
 	"errors"
 	"strings"
@@ -19,11 +19,16 @@ const (
 	AllowedImageTypes  = "image/jpeg,image/png,image/webp"
 )
 
-type AdvertisementHandler struct {
-	adService services.AdvertisementService
+type AdvertisementService interface {
+	CreateAd(userID uint, title, description, imageURL string, price float64) (*domain.Advertisement, error)
+	GetAds(page, limit int, sortBy, order string, minPrice, maxPrice float64) ([]domain.Advertisement, error)
 }
 
-func NewAdvertisementHandler(adService services.AdvertisementService) *AdvertisementHandler {
+type AdvertisementHandler struct {
+	adService AdvertisementService
+}
+
+func NewAdvertisementHandler(adService AdvertisementService) *AdvertisementHandler {
 	return &AdvertisementHandler{adService: adService}
 }
 

@@ -2,24 +2,23 @@ package services
 
 import (
 	"VK/internal/domain"
-	"VK/internal/repository"
 	"VK/pkg/jwt"
 	"errors"
 	"time"
 )
 
-type AuthService interface {
-	Register(username, password string) (*domain.User, error)
-	Login(username, password string) (string, error)
-	ValidateToken(token string) (uint, error)
+type UserRepository interface {
+	Create(user *domain.User) error
+	GetByUsername(username string) (*domain.User, error)
+	Exists(username string) (bool, error)
 }
 
 type authService struct {
-	userRepo repository.UserRepository
+	userRepo UserRepository
 	jwtSecret string
 }
 
-func NewAuthService(userRepo repository.UserRepository, jwtSecret string) AuthService {
+func NewAuthService(userRepo UserRepository, jwtSecret string) *authService {
 	return &authService{
 		userRepo: userRepo,
 		jwtSecret: jwtSecret,

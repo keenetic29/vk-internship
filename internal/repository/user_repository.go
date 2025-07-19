@@ -5,17 +5,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository interface {
-	Create(user *domain.User) error
-	GetByUsername(username string) (*domain.User, error)
-	Exists(username string) (bool, error)
-}
-
 type userRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) UserRepository {
+func NewUserRepository(db *gorm.DB) *userRepository {
 	return &userRepository{db: db}
 }
 

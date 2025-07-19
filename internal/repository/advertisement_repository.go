@@ -5,16 +5,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type AdvertisementRepository interface {
-	Create(ad *domain.Advertisement) error
-	GetAll(page, limit int, sortBy, order string, minPrice, maxPrice float64) ([]domain.Advertisement, error)
-}
-
 type advertisementRepository struct {
 	db *gorm.DB
 }
 
-func NewAdvertisementRepository(db *gorm.DB) AdvertisementRepository {
+func NewAdvertisementRepository(db *gorm.DB) *advertisementRepository {
 	return &advertisementRepository{db: db}
 }
 

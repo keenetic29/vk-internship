@@ -2,20 +2,19 @@ package services
 
 import (
 	"VK/internal/domain"
-	"VK/internal/repository"
 	"errors"
 )
 
-type AdvertisementService interface {
-	CreateAd(userID uint, title, description, imageURL string, price float64) (*domain.Advertisement, error)
-	GetAds(page, limit int, sortBy, order string, minPrice, maxPrice float64) ([]domain.Advertisement, error)
+type AdvertisementRepository interface {
+	Create(ad *domain.Advertisement) error
+	GetAll(page, limit int, sortBy, order string, minPrice, maxPrice float64) ([]domain.Advertisement, error)
 }
 
 type advertisementService struct {
-	adRepo repository.AdvertisementRepository
+	adRepo AdvertisementRepository
 }
 
-func NewAdvertisementService(adRepo repository.AdvertisementRepository) AdvertisementService {
+func NewAdvertisementService(adRepo AdvertisementRepository) *advertisementService {
 	return &advertisementService{adRepo: adRepo}
 }
 
