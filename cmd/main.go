@@ -1,12 +1,12 @@
 package main
 
 import (
-	"VK/internal/api"
-	"VK/internal/config"
-	"VK/internal/repository"
-	"VK/internal/services"
-	"VK/pkg/database"
-	"VK/pkg/logger"
+	"github.com/keenetic29/vk-internship/internal/api"
+	"github.com/keenetic29/vk-internship/internal/config"
+	"github.com/keenetic29/vk-internship/internal/repository"
+	"github.com/keenetic29/vk-internship/internal/services"
+	"github.com/keenetic29/vk-internship/pkg/database"
+	"github.com/keenetic29/vk-internship/pkg/logger"
 	"log"
 )
 
@@ -16,7 +16,7 @@ func main() {
 		log.Fatal("Failed to load config", err)
 	}
 
-	if err := logger.Init(cfg.LogDebug, cfg.LogFile); err != nil {
+	if err := logger.Init(cfg.LogDebug, cfg.LogFile, "marketplace.go"); err != nil {
 		log.Fatal("Failed to initialize logger:", err)
 	}
 	defer logger.Sync()
@@ -26,7 +26,7 @@ func main() {
 		"debug", cfg.LogDebug,
 	)
 
-	db, err := database.InitDB(cfg.GetDBConnectionString())
+	db, err := database.InitDB(cfg.GetBDCreateString(), cfg.GetDBConnectionString(), cfg.DBName)
 	if err != nil {
 		log.Fatal("Failed to connect to database", err)
 	}

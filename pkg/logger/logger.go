@@ -14,7 +14,7 @@ var (
 	mu   sync.Mutex
 )
 
-func Init(debug string, logDir string) error {
+func Init(debug string, logDir string, logName string) error {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -22,7 +22,7 @@ func Init(debug string, logDir string) error {
 		return err
 	}
 
-	logPath := filepath.Join(logDir, "marketplace.log")
+	logPath := filepath.Join(logDir, logName)
 	file, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err

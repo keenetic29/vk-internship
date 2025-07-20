@@ -1,7 +1,7 @@
 package database
 
 import (
-	"VK/internal/domain"
+	"github.com/keenetic29/vk-internship/internal/domain"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -9,26 +9,26 @@ import (
 )
 
 
-func InitDB(dsn string) (*gorm.DB, error) {
+func InitDB(dsnCreateDB, dsnConnect, dbName string) (*gorm.DB, error) {
     // Сначала подключаемся к БД postgres (которая всегда есть)
-    adminDB, err := gorm.Open(postgres.Open("postgres://postgres:1@localhost:5432/postgres?sslmode=disable"), &gorm.Config{})
+    adminDB, err := gorm.Open(postgres.Open(dsnCreateDB), &gorm.Config{})
     if err != nil {
         return nil, fmt.Errorf("failed to connect to admin DB: %w", err)
     }
 
-    // Проверяем существование marketplace
+    // Проверяем существование указанной БД
     var count int64
-    adminDB.Raw("SELECT COUNT(*) FROM pg_database WHERE datname = 'marketplace'").Scan(&count)
+    adminDB.Raw("SELECT COUNT(*) FROM pg_database WHERE datname = ?", dbName).Scan(&count)
     
     if count == 0 {
         // Создаём БД если её нет
-        if err := adminDB.Exec("CREATE DATABASE marketplace").Error; err != nil {
+        if err := adminDB.Exec(fmt.Sprintf("CREATE DATABASE %s", dbName)).Error; err != nil {
             return nil, fmt.Errorf("failed to create database: %w", err)
         }
     }
 
     // Теперь подключаемся к нужной БД
-    db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+    db, err := gorm.Open(postgres.Open(dsnConnect), &gorm.Config{})
     if err != nil {
         return nil, fmt.Errorf("failed to connect to target DB: %w", err)
     }

@@ -1,8 +1,8 @@
 package api
 
 import (
-	"VK/internal/api/handlers"
-	"VK/internal/services"
+	"github.com/keenetic29/vk-internship/internal/api/handlers"
+	"github.com/keenetic29/vk-internship/internal/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

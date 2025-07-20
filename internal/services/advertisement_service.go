@@ -1,7 +1,7 @@
 package services
 
 import (
-	"VK/internal/domain"
+	"github.com/keenetic29/vk-internship/internal/domain"
 	"errors"
 )
 

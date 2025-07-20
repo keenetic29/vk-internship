@@ -52,6 +52,14 @@ func (c *Config) GetDBConnectionString() string {
         c.DBName)
 }
 
+func (c *Config) GetBDCreateString() string {
+    return fmt.Sprintf("postgres://%s:%s@%s:%s/postgres?sslmode=disable",
+        c.DBUser,
+        c.DBPassword,
+		c.DBHost,
+		c.DBPort)
+}
+
 func loadEnvFile(filename string) error {
 	file, err := os.Open(filename)
 	if err != nil {

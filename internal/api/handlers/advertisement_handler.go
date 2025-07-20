@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"VK/internal/domain"
-	"VK/pkg/logger"
+	"github.com/keenetic29/vk-internship/internal/domain"
+	"github.com/keenetic29/vk-internship/pkg/logger"
 	"errors"
 	"strings"
 	"time"
@@ -19,6 +19,10 @@ const (
 	AllowedImageTypes  = "image/jpeg,image/png,image/webp"
 )
 
+type HTTPClient interface {
+    Head(url string) (*http.Response, error)
+}
+
 type AdvertisementService interface {
 	CreateAd(userID uint, title, description, imageURL string, price float64) (*domain.Advertisement, error)
 	GetAds(page, limit int, sortBy, order string, minPrice, maxPrice float64) ([]domain.Advertisement, error)
@@ -26,10 +30,19 @@ type AdvertisementService interface {
 
 type AdvertisementHandler struct {
 	adService AdvertisementService
+	httpClient HTTPClient
 }
 
 func NewAdvertisementHandler(adService AdvertisementService) *AdvertisementHandler {
-	return &AdvertisementHandler{adService: adService}
+	return &AdvertisementHandler{
+        adService: adService,
+        httpClient: &http.Client{Timeout: ImageCheckTimeout},
+    }
+}
+
+// устанавливает HTTPClient (для тестов)
+func (h *AdvertisementHandler) SetHTTPClient(client HTTPClient) {
+	h.httpClient = client
 }
 
 type CreateAdRequest struct {
@@ -42,8 +55,7 @@ type CreateAdRequest struct {
 func (h *AdvertisementHandler) validateImageURL(imageURL string) error {
 	logger.Log.Debug("Validating image URL", "url", imageURL)
 
-	client := http.Client{Timeout: ImageCheckTimeout}
-	resp, err := client.Head(imageURL)
+	resp, err := h.httpClient.Head(imageURL)
 	if err != nil {
 		logger.Log.Warn("Image URL validation failed", 
 			"error", err,

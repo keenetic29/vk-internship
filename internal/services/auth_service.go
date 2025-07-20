@@ -1,9 +1,9 @@
 package services
 
 import (
-	"VK/internal/domain"
-	pass "VK/pkg/password"
-	"VK/pkg/jwt"
+	"github.com/keenetic29/vk-internship/internal/domain"
+	pass "github.com/keenetic29/vk-internship/pkg/password"
+	"github.com/keenetic29/vk-internship/pkg/jwt"
 	"errors"
 	"time"
 )

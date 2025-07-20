@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"VK/internal/domain"
+	"github.com/keenetic29/vk-internship/internal/domain"
 	"gorm.io/gorm"
 )
 

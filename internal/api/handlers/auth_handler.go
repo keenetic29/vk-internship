@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"VK/internal/domain"
-	"VK/pkg/logger"
+	"github.com/keenetic29/vk-internship/internal/domain"
+	"github.com/keenetic29/vk-internship/pkg/logger"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
