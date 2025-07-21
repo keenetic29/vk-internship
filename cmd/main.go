@@ -43,7 +43,7 @@ func main() {
 
 	router := api.SetupRouter(authService, adService, cfg.JWTSecret)
 
-	if err := router.Run(cfg.ServerAddr); err != nil {
+	if err := router.Run(":"+cfg.ServerAddr); err != nil {
 		log.Fatal("Failed to start server", err)
 	}
 }
